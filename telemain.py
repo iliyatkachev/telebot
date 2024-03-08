@@ -1,40 +1,30 @@
 import asyncio
-import asyncio
 import logging
-
-from aiogram import Bot, Dispatcher, types
-from aiogram.filters import CommandStart, Command
+import sqlite3
+from app.admin import admin_menu
+from aiogram import Bot, Dispatcher, types, Router
 from config import bot_token
+from aiogram.filters import Command
+from app.comands import commands
+from app.start import start_button
+
 
 logging.basicConfig(level=logging.INFO)
-
 bot = Bot(token=bot_token)
 dp = Dispatcher()
+dp.include_routers(admin_menu.admin_router, commands.commands_router,start_button.start_router )
 
-#обработка команды старт
-@dp.message(CommandStart())
-async def hendel_start(message: types.Message):
-    await message.answer(text=f'Hello, {message.from_user.full_name}!')
+router = Router
 
-#обработка команды хелп
-@dp.message(Command("help"))
-async def hendel_help(message: types.Message):
-    await message.answer(text="Если у вас возникли проблемы, обратитесь в службу поддержки...")
+#command opportunities
+@dp.message(Command("opportunities", prefix="/!"))
+async def opportunities(message: types.Message):
+    await message.answer(text="В этом боте вы сможете найти фильмы и сериалы которые так давно хотели посмотреть!")
 
-#стартовая кнопка
-@dp.message()
-async def echo(message: types.Message):
-    try:
-        await message.send_copy(chat_id=message.chat.id)
-    except TypeError:
-        await message.reply(text="Простите, я не понимаю вас...")
-
-#логика бота
+#start project
 async def main():
     logging.basicConfig(level=logging.INFO)
     await dp.start_polling(bot)
-
 if __name__ == '__main__':
     asyncio.run(main())
-
 
