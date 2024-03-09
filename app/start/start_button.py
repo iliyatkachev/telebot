@@ -1,5 +1,5 @@
 import random
-import sqlite3
+from app.SQL.sql import bd
 from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -18,6 +18,7 @@ start_router = Router()
 #command start
 @start_router.message(Command("start"))
 async def protect(message: types.Message):
+    await bd(message)
     if message.from_user.id not in admins:
 
         num1 = random.randint(1, 11)
@@ -40,42 +41,14 @@ async def protect(message: types.Message):
                              reply_markup=reply_markup)
     else:
         return await admin_start(message)
-def start(message: types.Message):
-    conn = sqlite3.connect('bot.sql')
-    cur = conn.cursor()
-
-    cur.execute('CREATE TABLE IF NOT EXISTS users (id int auto_increment primary key, name varchar(100), pass varchar(50))')
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    message.answer( f'Привет {message.from_user}')
-    message.register_next_step_handler(message, user_name)
-
-def user_name(message):
-    global name
-    name = message.text.strip()
-
-    message.answer(f'Продолжим {message.from_user}')
-    message.register_next_step_handler(message, user_pass)
-
-def user_pass(message):
-    password = message.text.strip()
-    conn = sqlite3.connect('bot.sql')
-    cur = conn.cursor()
-
-    cur.execute('INSERT INTO users (name, pass) VALUES ("%s", "%s")' % (name, password))
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    message.answer(message.chat.id, f'Готово  {message.from_user}')
 
 @start_router.callback_query(F.data == "correct")
 async def start(callback: types.CallbackQuery):
     await callback.message.delete()
     reply_markup = InlineKeyboardMarkup(inline_keyboard=button)
     await callback.message.answer(text=f"Привет {callback.from_user.full_name}!", reply_markup=reply_markup)
+
+
 
 
 @start_router.callback_query(F.data == "f_menu")
@@ -99,3 +72,5 @@ async def hendel_help(message: types.Message):
     ]
     reply_markup = InlineKeyboardMarkup(inline_keyboard=button)
     await message.answer(text="Если у вас возникли проблемы, обратитесь в службу поддержки...", reply_markup=reply_markup)
+
+

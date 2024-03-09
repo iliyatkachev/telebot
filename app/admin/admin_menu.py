@@ -5,7 +5,8 @@ from aiogram import Bot, Dispatcher, types, Router,F
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from config import bot_token
 from aiogram.filters import CommandStart, Command
-from app.click.keybort import button, menu_button, films_button, serials_button, admin_button, a_opportunities_button
+from app.click.keybort import (button, menu_button, films_button, serials_button, admin_button, a_opportunities_button,
+                               a_stat_button)
 from config import admins
 
 
@@ -25,6 +26,7 @@ async def admin_start(message: types.Message):
 
 @admin_router.callback_query(F.data == "a_menu")
 async def a_menu(callback: types.CallbackQuery):
+    await callback.answer('Вы перешли во вкладку меню')
     await callback.message.delete()
     reply_markup = InlineKeyboardMarkup(inline_keyboard=menu_button)
     await callback.message.answer(text=f'Вы попали в главное меню! Здесь вы можете выбрать жанр фильма,'
@@ -34,6 +36,16 @@ async def a_menu(callback: types.CallbackQuery):
 
 @admin_router.callback_query(F.data == "a_opportunities")
 async def a_opportunities(callback: types.CallbackQuery):
+    await callback.answer('Вы перешли во вкладку возможности')
     await callback.message.delete()
     reply_markup = InlineKeyboardMarkup(inline_keyboard=a_opportunities_button)
     await callback.message.answer(text=f'Тут вы можете управлять админ персоналдом!', reply_markup=reply_markup)
+
+@admin_router.callback_query(F.data == "a_stat")
+async def a_stat(callback: types.CallbackQuery):
+    await callback.answer('Вы перешли во вкладку статистика')
+    await callback.message.delete()
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=a_stat_button)
+    await callback.message.answer(text=f'Отображение пользователей.\n'
+                                       f'Удаление пользователей.\n'
+                                       f'Блокировка пользователей.', reply_markup=reply_markup)

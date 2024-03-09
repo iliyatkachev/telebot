@@ -137,7 +137,18 @@ a_opportunities_button = [
     ]
 ]
 
-
+a_stat_button = [
+    [
+        InlineKeyboardButton(text="Отоброжение пользователей🪬", callback_data="s_full_users")
+    ],
+    [
+        InlineKeyboardButton(text="Блокировка пользователя🗿", callback_data="s_block"),
+        InlineKeyboardButton(text="Удаление пользователя❌", callback_data="s_del")
+    ],
+    [
+        InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="f_menu")
+    ]
+]
 
 
 anime_button = [
