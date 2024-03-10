@@ -183,5 +183,10 @@ back_button = [
     ]
 ]
 
-
+a_mailing_button = [
+    [
+        InlineKeyboardButton(text="Добавить✔️", callback_data="a_m_add"),
+        InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="f_menu")
+    ]
+]
 

@@ -1,15 +1,10 @@
-import asyncio
 import logging
-import random
 from aiogram import Bot, Dispatcher, types, Router,F
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup
 from config import bot_token
-from aiogram.filters import CommandStart, Command
-from app.click.keybort import (button, menu_button, films_button, serials_button, admin_button, a_opportunities_button,
+from aiogram.filters import Command
+from app.click.keybort import (menu_button, admin_button, a_opportunities_button,
                                a_stat_button)
-from config import admins
-
-
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=bot_token)
@@ -49,3 +44,4 @@ async def a_stat(callback: types.CallbackQuery):
     await callback.message.answer(text=f'Отображение пользователей.\n'
                                        f'Удаление пользователей.\n'
                                        f'Блокировка пользователей.', reply_markup=reply_markup)
+
