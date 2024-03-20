@@ -88,7 +88,9 @@ async def full_com(message: Message, state: FSMContext):
                 InlineKeyboardButton(text="Отправить!", callback_data="add_post_button")
             ],
             [
-                InlineKeyboardButton(text="Удалить", callback_data="delete_post_button")
+                InlineKeyboardButton(text="Удалить", callback_data="delete_post_button"),
+                InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="f_menu")
+
             ]
         ]
 

@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+from aiogram import types
+from app.SQL.sql import fetch_urls_and_ids
 
 button = [
         [
@@ -119,8 +120,7 @@ admin_button = [
         InlineKeyboardButton(text="Возможности✨", callback_data="a_opportunities")
     ],
     [
-        InlineKeyboardButton(text="Каналы🪬", callback_data="channels"),
-        InlineKeyboardButton(text="Бан🗿", callback_data="ban")
+        InlineKeyboardButton(text="Каналы🪬", callback_data="channels")
     ]
 ]
 
@@ -133,7 +133,7 @@ a_opportunities_button = [
         InlineKeyboardButton(text="удалить админа", callback_data="delete_admin")
     ],
     [
-        InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="f_menu")
+        InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="back_a_m")
     ]
 ]
 
@@ -146,7 +146,7 @@ a_stat_button = [
         InlineKeyboardButton(text="Удаление пользователя❌", callback_data="s_del")
     ],
     [
-        InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="f_menu")
+        InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="back_a_m")
     ]
 ]
 
@@ -186,7 +186,37 @@ back_button = [
 a_mailing_button = [
     [
         InlineKeyboardButton(text="Добавить✔️", callback_data="a_m_add"),
-        InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="f_menu")
+        InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="back_a_m")
     ]
 ]
 
+a_channels_button = [
+    [
+        InlineKeyboardButton(text="Добавить✔️", callback_data="a_c_add"),
+        InlineKeyboardButton(text="удалить❌", callback_data="a_c_delete")
+    ],
+    [
+        InlineKeyboardButton(text='Вернуться в админ меню🔙', callback_data="back_a_m")
+    ]
+]
+
+admin_menu_button = [
+    [
+        InlineKeyboardButton(text='Вернуться в админ меню🔙', callback_data="back_a_m")
+    ]
+]
+
+async def channels_add(callback: types.CallbackQuery):
+    public_urls = fetch_urls_and_ids()
+
+    if public_urls:
+        keyboard_publics = [
+                [InlineKeyboardButton(text="Подпишись👈", url=url)]
+                for url in public_urls
+            ]
+        keyboard_publics.append([InlineKeyboardButton(text="Проверить подписку", callback_data='check_me')])
+        buttons = InlineKeyboardMarkup(inline_keyboard=keyboard_publics)
+        await callback.message.answer('⚠️ Пожалуйста, подпишитесь на все паблики для использования бота.',
+                                      reply_markup=buttons)
+    else:
+        await callback.message.answer("Извините, у вас ещё нет пабликов")

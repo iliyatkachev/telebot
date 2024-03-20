@@ -1,5 +1,5 @@
 import random
-from app.SQL.sql import bd
+from app.SQL.sql import bd, fetch_urls_and_ids, find_public_ids
 from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -13,6 +13,7 @@ from app.comands.commands import menu
 
 name = None
 start_router = Router()
+
 
 
 #command start
@@ -42,12 +43,15 @@ async def protect(message: types.Message):
     else:
         return await admin_start(message)
 
+
+
+
+
 @start_router.callback_query(F.data == "correct")
 async def start(callback: types.CallbackQuery):
     await callback.message.delete()
     reply_markup = InlineKeyboardMarkup(inline_keyboard=button)
     await callback.message.answer(text=f"Привет {callback.from_user.full_name}!", reply_markup=reply_markup)
-
 
 
 

@@ -1,7 +1,8 @@
 from aiogram import F, types, Router
-from aiogram.types import InlineKeyboardMarkup
-from app.SQL.sql import fetch_user_date, ferch_all_users, fetch_user_name
-from app.click.keybort import menu_button, serials_button, films_button, anime_button, back_button
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from app.SQL.sql import fetch_user_date, ferch_all_users, find_public_ids, fetch_urls_and_ids
+from app.click.keybort import menu_button, serials_button, films_button, anime_button, back_button, admin_button
+from app.click.keybort import channels_add
 
 commands_router = Router()
 
@@ -9,11 +10,32 @@ commands_router = Router()
 #command menu
 @commands_router.callback_query(F.data == "menu")
 async def menu(callback: types.CallbackQuery):
-    await callback.answer('Вы перешли во вкладку меню')
-    await callback.message.delete()
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=menu_button)
-    await callback.message.answer(text=f'Вы попали в главное меню! Здесь вы можете выбрать жанр фильма,'
-                                       f' просмотреть подробную информацию и многое другое🫠', reply_markup=reply_markup)
+    public_ids = find_public_ids()
+
+    user_id = callback.from_user.id
+    sub = True
+
+    for chat_id in public_ids:
+        try:
+            status = await callback.bot.get_chat_member(chat_id=chat_id, user_id=user_id)
+            if status.status not in ['creator', 'administrator', 'member']:
+                sub = False
+                break
+        except Exception as e:
+            print(f"Ошибка при проверке подписки пользователя {user_id} на паблик {chat_id}: {e}")
+            sub = False
+            break
+
+    if not sub:
+        return await channels_add(callback)
+    else:
+
+        await callback.answer('Вы перешли во вкладку меню')
+        await callback.message.delete()
+        reply_markup = InlineKeyboardMarkup(inline_keyboard=menu_button)
+        await callback.message.answer(text=f'Вы попали в главное меню! Здесь вы можете выбрать жанр фильма,'
+                                           f' просмотреть подробную информацию и многое другое🫠',
+                                      reply_markup=reply_markup)
 
 
 
@@ -85,4 +107,9 @@ async def opportunities(callback: types.CallbackQuery):
     await callback.message.delete()
     await callback.message.answer(text="В этом боте вы сможете найти фильмы и сериалы которые так давно хотели посмотреть!")
 
+@commands_router.callback_query(F.data == "back_a_m")
+async def a_menu(callback: types.CallbackQuery):
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=admin_button)
+    await callback.message.delete()
+    await callback.message.answer(text='Вы перешли в админ меню', reply_markup=reply_markup)
 
