@@ -1,9 +1,9 @@
 import random
-from app.SQL.sql import bd, fetch_urls_and_ids, find_public_ids
+from app.SQL.sql import bd, fetch_urls_and_ids, find_public_ids, fetch_admins_from_db
 from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from config import admins
+
 
 
 
@@ -20,7 +20,7 @@ start_router = Router()
 @start_router.message(Command("start"))
 async def protect(message: types.Message):
     await bd(message)
-    if message.from_user.id not in admins:
+    if message.from_user.id not in await fetch_admins_from_db():
 
         num1 = random.randint(1, 11)
         num2 = random.randint(1, 11)

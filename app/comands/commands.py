@@ -2,7 +2,7 @@ from aiogram import F, types, Router
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from app.SQL.sql import fetch_user_date, ferch_all_users, find_public_ids, fetch_urls_and_ids
 from app.click.keybort import menu_button, serials_button, films_button, anime_button, back_button, admin_button
-from app.click.keybort import channels_add
+from app.channel.channel_funk import channels_add
 
 commands_router = Router()
 
@@ -36,6 +36,7 @@ async def menu(callback: types.CallbackQuery):
         await callback.message.answer(text=f'Вы попали в главное меню! Здесь вы можете выбрать жанр фильма,'
                                            f' просмотреть подробную информацию и многое другое🫠',
                                       reply_markup=reply_markup)
+
 
 
 
@@ -105,11 +106,18 @@ async def videogaid(callback: types.CallbackQuery):
 async def opportunities(callback: types.CallbackQuery):
     await callback.answer('Вы перешли во вкладку возможности')
     await callback.message.delete()
-    await callback.message.answer(text="В этом боте вы сможете найти фильмы и сериалы которые так давно хотели посмотреть!")
+    await callback.message.answer(text="В этом боте вы сможете найти фильмы и сериалы которые так давно хотели "
+                                       "посмотреть!")
 
 @commands_router.callback_query(F.data == "back_a_m")
 async def a_menu(callback: types.CallbackQuery):
     reply_markup = InlineKeyboardMarkup(inline_keyboard=admin_button)
     await callback.message.delete()
     await callback.message.answer(text='Вы перешли в админ меню', reply_markup=reply_markup)
+
+@commands_router.callback_query(F.data == "check_me")
+async def check_me(callback: types.CallbackQuery):
+    return await menu(callback)
+
+
 

@@ -138,3 +138,6 @@ async def delete_post(callback: types.CallbackQuery, state: FSMContext) -> None:
     await state.get_state()
     await state.clear()
     await callback.answer("Пост удалён!")
+
+
+

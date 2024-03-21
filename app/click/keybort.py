@@ -1,6 +1,6 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram import types
-from app.SQL.sql import fetch_urls_and_ids
+from aiogram.types import InlineKeyboardButton
+
+
 
 button = [
         [
@@ -206,17 +206,3 @@ admin_menu_button = [
     ]
 ]
 
-async def channels_add(callback: types.CallbackQuery):
-    public_urls = fetch_urls_and_ids()
-
-    if public_urls:
-        keyboard_publics = [
-                [InlineKeyboardButton(text="Подпишись👈", url=url)]
-                for url in public_urls
-            ]
-        keyboard_publics.append([InlineKeyboardButton(text="Проверить подписку", callback_data='check_me')])
-        buttons = InlineKeyboardMarkup(inline_keyboard=keyboard_publics)
-        await callback.message.answer('⚠️ Пожалуйста, подпишитесь на все паблики для использования бота.',
-                                      reply_markup=buttons)
-    else:
-        await callback.message.answer("Извините, у вас ещё нет пабликов")

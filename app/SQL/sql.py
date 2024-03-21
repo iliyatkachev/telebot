@@ -128,3 +128,30 @@ def find_public_ids():
     connect.close()
 
     return ids
+
+
+
+async def add_admin(name, id_admin):
+    connect = sqlite3.connect('users_bd.db')
+    cursor = connect.cursor()
+
+    cursor.execute("INSERT INTO admin(name, id_admin) VALUES (?, ?)",
+                   (name, id_admin))
+
+    connect.commit()
+    cursor.close()
+    connect.close()
+
+
+async def fetch_admins_from_db():
+    connect = sqlite3.connect('users_bd.db')  # Путь к вашей базе данных
+    cursor = connect.cursor()
+
+    # Запрос на выборку всех user_id администраторов из таблицы
+    cursor.execute("SELECT id_admin FROM admin")
+    admins = cursor.fetchall()  # Получаем список кортежей с одним элементом
+
+    cursor.close()
+    connect.close()
+
+    return [admin[0] for admin in admins]
