@@ -146,7 +146,6 @@ async def add_admin(name, id_admin):
 async def fetch_admins_from_db():
     connect = sqlite3.connect('users_bd.db')  # Путь к вашей базе данных
     cursor = connect.cursor()
-
     # Запрос на выборку всех user_id администраторов из таблицы
     cursor.execute("SELECT id_admin FROM admin")
     admins = cursor.fetchall()  # Получаем список кортежей с одним элементом

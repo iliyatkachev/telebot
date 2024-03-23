@@ -1,10 +1,10 @@
 import asyncio
 import logging
-import sqlite3
 
 from aiogram.enums import ParseMode
 from app.admin import mailing_clik
 from app.admin import admin_menu
+from app.admins import managing_administrators
 from aiogram import Bot, Dispatcher, types, Router
 from config import bot_token
 from aiogram.filters import Command
@@ -16,7 +16,8 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=bot_token, parse_mode=ParseMode.HTML)
 dp = Dispatcher()
 dp.include_routers(admin_menu.admin_router, commands.commands_router,start_button.start_router, sql.sql_router,
-                   mailing_clik.mailing_router, mailing_clik.form_router, admin_menu.form_channel, )
+                   mailing_clik.mailing_router, mailing_clik.form_router, admin_menu.form_channel,
+                   managing_administrators.admin_router)
 router = Router
 
 #command opportunities

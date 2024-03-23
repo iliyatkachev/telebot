@@ -2,7 +2,6 @@ from aiogram import F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from app.SQL.sql import add_admin
 from app.SQL.sql import add_channel, delete_all_channels, fetch_urls_and_ids
 from app.admin.admin_menu import form_channel
 from app.click.keybort import admin_menu_button
@@ -80,45 +79,3 @@ async def channels_add(callback: types.CallbackQuery):
         await callback.message.answer("Извините, у вас ещё нет пабликов")
 
 
-
-class Admin(StatesGroup):
-    name_admin = State()
-    id_admin = State()
-    full_admin = State()
-
-@form_channel.callback_query(F.data == 'add_admin')
-async def channel(callback: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Admin.name_admin)
-    await callback.answer(text='Вы першли во вкладку возможност!')
-    await callback.message.delete()
-    await callback.message.answer(text='Введите имя администратора')
-
-@form_channel.message(Admin.name_admin)
-async def name_admin(message: Message, state: FSMContext):
-    await state.update_data(name_admin=message.text)
-    await state.set_state(Admin.id_admin)
-    await message.answer(text='Отлично!\nТеперь напишите ID нового администратора')
-
-
-@form_channel.message(Admin.id_admin)
-async def id_admin(message: Message, state: FSMContext):
-    await state.update_data(id_admin=message.text)
-    await state.set_state(Admin.full_admin)
-    await message.answer(text='Хорошо!\n Данные собранны, напиши "ОК" для продолжения')
-
-@form_channel.message(Admin.full_admin)
-async def full_admin(message: Message, state: FSMContext):
-    if F.text.lower() == "ОК":
-        data = await state.get_data()
-        name = data.get('name_admin', '')
-        id_admin = data.get('id_admin', '')
-        await add_admin(name=name, id_admin=id_admin)
-        reply_markup = InlineKeyboardMarkup(inline_keyboard=admin_menu_button)
-        await message.answer(text="Админ успешно добавлен!", reply_markup=reply_markup)
-
-
-@form_channel.callback_query(F.data == 'admin_delete')
-async def delete_admin(message: Message):
-    await delete_admin(message)
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=admin_menu_button)
-    await message.answer(text="Все админы были удаленны!", reply_markup=reply_markup)

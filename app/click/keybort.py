@@ -126,7 +126,8 @@ admin_button = [
 
 a_opportunities_button = [
     [
-        InlineKeyboardButton(text="Список админов", callback_data="list_admin")
+        InlineKeyboardButton(text="Список админов", callback_data="list_admin"),
+
     ],
     [
         InlineKeyboardButton(text="Добавить админа", callback_data="add_admin"),
