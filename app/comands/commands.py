@@ -3,6 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from app.SQL.sql import fetch_user_date, ferch_all_users, find_public_ids, fetch_urls_and_ids
 from app.click.keybort import menu_button, serials_button, films_button, anime_button, back_button, admin_button
 from app.channel.channel_funk import channels_add
+import requests
 
 commands_router = Router()
 
@@ -58,7 +59,6 @@ async def films(callback: types.CallbackQuery):
     await callback.message.delete()
     reply_markup = InlineKeyboardMarkup(inline_keyboard=films_button)
     await callback.message.answer(text=f'Выберите жанр, который хотите посмотреть📺', reply_markup=reply_markup)
-
 
 
 #command anime
