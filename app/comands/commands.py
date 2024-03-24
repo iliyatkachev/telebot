@@ -1,7 +1,7 @@
 from aiogram import F, types, Router
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from app.SQL.sql import fetch_user_date, ferch_all_users, find_public_ids, fetch_urls_and_ids
-from app.click.keybort import menu_button, serials_button, films_button, anime_button, back_button, admin_button
+from app.click.keybort import menu_button, films_button, back_button, admin_button
 from app.channel.channel_funk import channels_add
 import requests
 
@@ -41,33 +41,22 @@ async def menu(callback: types.CallbackQuery):
 
 
 
-#command serials
-@commands_router.callback_query(F.data == "serials")
-async def serials(callback: types.CallbackQuery):
-    await callback.answer('Вы перешли во вкладку сериалы')
-    await callback.message.delete()
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=serials_button)
-    await callback.message.answer(text=f'Вы попали в главное меню! Здесь вы можете выбрать жанр фильма,'
-                                       f' просмотреть подробную информацию и многое другое🫠', reply_markup=reply_markup)
-
 
 
 #command faims
 @commands_router.callback_query(F.data == "films")
 async def films(callback: types.CallbackQuery):
-    await callback.answer('Вы перешли во вкладку фильмы')
+    await callback.answer('Вы перешли во вкладку поиск')
     await callback.message.delete()
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=films_button)
-    await callback.message.answer(text=f'Выберите жанр, который хотите посмотреть📺', reply_markup=reply_markup)
+    url = "https://apivb.info/api/videos.json?title=гарри_поттер&token=0befa987b7d85bcdad0b31e2e7c3f4ec"
 
+    response = requests.get(url)
+    if response.status_code == 200:
+        movies = response.json()
+        for movie in movies:
+            await callback.message.answer(f'Название: {movie["title_ru"]}\nURL: <a href="'
+                                          f'{movie["iframe_url"]}">Смотреть фильм</a>')
 
-#command anime
-@commands_router.callback_query(F.data == "anime")
-async def anime(callback: types.CallbackQuery):
-    await callback.answer('Вы перешли во вкладку аниме')
-    await callback.message.delete()
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=anime_button)
-    await callback.message.answer(text=f'Выберите жанр, который хотите посмотреть📺', reply_markup=reply_markup)
 
 
 
