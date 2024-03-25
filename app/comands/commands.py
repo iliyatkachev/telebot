@@ -1,9 +1,13 @@
 from aiogram import F, types, Router
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from app.SQL.sql import fetch_user_date, ferch_all_users, find_public_ids, fetch_urls_and_ids
-from app.click.keybort import menu_button, films_button, back_button, admin_button
+from aiogram.types import InlineKeyboardMarkup
+from app.SQL.sql import fetch_user_date, ferch_all_users, find_public_ids
+from app.click.keybort import menu_button, back_button, admin_button
 from app.channel.channel_funk import channels_add
-import requests
+from aiogram.utils.markdown import hlink
+from urllib.parse import quote
+
+import aiohttp
+
 
 commands_router = Router()
 
@@ -44,20 +48,37 @@ async def menu(callback: types.CallbackQuery):
 
 
 #command faims
-@commands_router.callback_query(F.data == "films")
-async def films(callback: types.CallbackQuery):
-    await callback.answer('Вы перешли во вкладку поиск')
-    await callback.message.delete()
-    url = "https://apivb.info/api/videos.json?title=гарри_поттер&token=0befa987b7d85bcdad0b31e2e7c3f4ec"
+@commands_router.inline_query()
+async def inline_films(inline_query: types.InlineQuery):
+    base_url = "https://apivb.info/api/videos.json?title={}&token=0befa987b7d85bcdad0b31e2e7c3f4ec"
+    search_query = quote(inline_query.query)  # Кодирование запроса пользователя для использования в URL
 
-    response = requests.get(url)
-    if response.status_code == 200:
-        movies = response.json()
-        for movie in movies:
-            await callback.message.answer(f'Название: {movie["title_ru"]}\nURL: <a href="'
-                                          f'{movie["iframe_url"]}">Смотреть фильм</a>')
+    # Формирование URL с учетом поискового запроса
+    url = base_url.format(search_query)
 
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            results = []
 
+            if response.status == 200:
+                movies = await response.json(content_type=None)
+                for index, movie in enumerate(movies, start=1):
+                    title = movie.get("title_ru", "Название не указано")
+                    iframe_url = movie.get("iframe_url", "#")
+                    text = f'Название: {title}\nURL: {hlink("Смотреть фильм", iframe_url)}'
+
+                    result = types.InlineQueryResultArticle(
+                        id=str(index),
+                        title=title,
+                        input_message_content=types.InputTextMessageContent(
+                            message_text=text, parse_mode="HTML"
+                        ),
+                        description="Нажмите для просмотра информации о фильме",
+                    )
+                    results.append(result)
+
+            # Ответ пользователю с результатами поиска
+            await inline_query.answer(results, cache_time=1)
 
 
 #command profile
