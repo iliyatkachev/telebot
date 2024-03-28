@@ -1,4 +1,6 @@
 from aiogram.types import InlineKeyboardButton
+from aiogram import types
+
 
 
 
@@ -20,7 +22,7 @@ menu_button = [
         InlineKeyboardButton(text="Профиль🪪", callback_data="profile")
     ],
     [
-        InlineKeyboardButton(text="Фильмы🎞️", callback_data="films"),
+        InlineKeyboardButton(text="Фильмы🎞️", switch_inline_query_current_chat=""),
     ],
     [
         InlineKeyboardButton(text="Подборка🛒", callback_data="Compilation")
@@ -109,3 +111,9 @@ admin_menu_button = [
     ]
 ]
 
+again = [
+    [
+        types.InlineKeyboardButton(text='♻️ Повторить поиск', switch_inline_query_current_chat=""),
+        types.InlineKeyboardButton(text='👈 В меню', callback_data='back_user_now')
+    ]
+]

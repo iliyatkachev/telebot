@@ -5,6 +5,8 @@ from app.click.keybort import menu_button, back_button, admin_button
 from app.channel.channel_funk import channels_add
 from aiogram.utils.markdown import hlink
 from urllib.parse import quote
+from uuid import uuid4
+from app.click.keybort import again
 
 import aiohttp
 
@@ -53,7 +55,6 @@ async def inline_films(inline_query: types.InlineQuery):
     base_url = "https://apivb.info/api/videos.json?title={}&token=0befa987b7d85bcdad0b31e2e7c3f4ec"
     search_query = quote(inline_query.query)  # Кодирование запроса пользователя для использования в URL
 
-    # Формирование URL с учетом поискового запроса
     url = base_url.format(search_query)
 
     async with aiohttp.ClientSession() as session:
@@ -61,24 +62,106 @@ async def inline_films(inline_query: types.InlineQuery):
             results = []
 
             if response.status == 200:
-                movies = await response.json(content_type=None)
-                for index, movie in enumerate(movies, start=1):
-                    title = movie.get("title_ru", "Название не указано")
-                    iframe_url = movie.get("iframe_url", "#")
-                    text = f'Название: {title}\nURL: {hlink("Смотреть фильм", iframe_url)}'
+                data = await response.json(content_type=None)
+
+                # Проверка типа ответа и выборка первых 50 фильмов
+                if isinstance(data, list):
+                    films = data[:50]
+                elif isinstance(data, dict):
+                    films = data.get('data', [])[:50]
+                else:
+                    films = []
+
+                for film in films:
+                    title = film.get("title_ru", "Название не указано")
+                    iframe_url = film.get("iframe_url", "#")
+                    # Создание HTML-ссылки в текстовом сообщении
+                    text = f'Название: {title}\nURL: [Смотреть фильм]({iframe_url})'
 
                     result = types.InlineQueryResultArticle(
-                        id=str(index),
+                        id=str(uuid4()),
                         title=title,
                         input_message_content=types.InputTextMessageContent(
-                            message_text=text, parse_mode="HTML"
+                            message_text=text, parse_mode="Markdown"
                         ),
                         description="Нажмите для просмотра информации о фильме",
                     )
                     results.append(result)
 
-            # Ответ пользователю с результатами поиска
             await inline_query.answer(results, cache_time=1)
+
+@commands_router.inline_query()
+async def inline_query(inline: types.InlineQuery):
+    query = inline.query
+    response = await inline_films(query)
+    results = []
+
+    if isinstance(response, list):
+        films = response[:50]
+    elif isinstance(response, dict):
+        films = response.get('data', [])[:50]
+    else:
+        films = []
+
+    for film in films:
+        title = film.get('title_ru') or film.get('title_en')
+        description = f"{film.get('year', 'Год не указан')}"
+        trailer_url = film.get('trailer', '').replace('\\/', '/')
+        poster_url = film.get('poster', '').replace('\\/', '/')
+        quality = film.get('quality', '')
+        iframe_url = film.get('iframe_url', '').replace('\\/', '/')
+        my_site_url = f"https://kinodomvideo.ru/video.php?video_token={iframe_url}"
+
+        unique_id = str(uuid4())
+
+        # Создание клавиатуры для фильма
+        keyboard_buttons = [
+            [types.InlineKeyboardButton(text="🤗 Начать просмотр", url=my_site_url)]
+        ]
+
+        # Добавление кнопки трейлера, если он доступен
+        if trailer_url:
+            keyboard_buttons.insert(1, [types.InlineKeyboardButton(text="🎬 Посмотреть трейлер", url=trailer_url)])
+
+        # Добавление кнопки для повторения поиска в конец списка кнопок
+        keyboard_buttons.append(
+            [types.InlineKeyboardButton(text='♻️ Повторить поиск', switch_inline_query_current_chat=""),
+             types.InlineKeyboardButton(text='👈 В меню', callback_data='back_user_now')])
+
+        # Создание клавиатуры с кнопками
+        keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
+
+        # Сообщение в результате поиска
+
+        result_text = types.InputTextMessageContent(
+            message_text=f"📽️ <b> Название: {film.get('title_ru')}</b>\n({film.get('title_en')})\n\n"
+                         f"🕥 <b>Дата выхода:</b> {description}\n\n"
+                         f"📷 <b>Качество:</b> {quality}\n\n Приятного просмотра! 🍿"
+        )
+
+        results.append(types.InlineQueryResultArticle(
+            id=unique_id,
+            title=title,
+            input_message_content=result_text,
+            description=description,
+            thumbnail_url=poster_url,
+            reply_markup=keyboard,
+        ))
+
+    if not films:
+        unique_id = str(uuid4())
+
+        ag_but = InlineKeyboardMarkup(inline_keyboard=again)
+
+        results.append(types.InlineQueryResultArticle(
+            id=unique_id,
+            title="Результаты не обнаружены 🫣",
+            input_message_content=types.InputTextMessageContent(message_text='инструкция в разработке'),
+            description="Нажми на меня, чтобы узнать почему",
+            reply_markup=ag_but
+        ))
+
+    await inline.answer(results, cache_time=1, is_personal=True)
 
 
 #command profile
