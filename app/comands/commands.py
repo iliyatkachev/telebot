@@ -8,9 +8,12 @@ from aiogram.utils.markdown import hlink
 from urllib.parse import quote
 from uuid import uuid4
 from app.click.keybort import again
+from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery
+from aiogram.fsm.state import StatesGroup, State
 
 import aiohttp
-
+import random
 
 commands_router = Router()
 
@@ -77,13 +80,14 @@ async def inline_films(inline_query: types.InlineQuery):
                 poster_url = film.get('poster', '').replace('\\/', '/')
                 quality = film.get('quality', '')
                 iframe_url = film.get('iframe_url', '').replace('\\/', '/')
+                my_site_url = f"https://kinodomvideo.ru/video.php?video_token={iframe_url}"
 
 
                 unique_id = str(uuid4())
 
                 # Создание клавиатуры для фильма
                 keyboard_buttons = [
-                    [types.InlineKeyboardButton(text="🤗 Начать просмотр", url=iframe_url)]
+                    [types.InlineKeyboardButton(text="🤗 Начать просмотр", url=my_site_url)]
                 ]
 
                 # Добавление кнопки трейлера, если он доступен
@@ -182,41 +186,139 @@ async def check_me(callback: types.CallbackQuery):
 
 
 
+class Pages(StatesGroup):
+    page = State()
+
+
 @commands_router.callback_query(F.data == "Compilation")
-async def compilation(callback: types.CallbackQuery, page=1):
-    films_URL = f"http://api.kinopoisk.dev/v1.4/movie?page={page}&limit=10&lists=top250"
+async def compilation(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    page = data.get('page', 1)
+
+    url = f"http://api.kinopoisk.dev/v1.4/movie?page={page}&limit=1&lists=top250"
     headers = {
         "accept": "application/json",
-        "X-API-KEY": "R3ZHKRH-HXV4BW8-JSDD6W9-CZX102N"
+        "X-API-Key": "VBZ63SW-PFHMYEM-M3384F6-X6BXVSY"
     }
+
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url=films_URL, headers=headers) as response:
+            async with session.get(url=url, headers=headers) as response:
                 if response.status == 200:
+                    await callback.message.delete()
                     data = await response.json(content_type=None)
                     films = data.get('docs', [])
 
                     messages = []
-                    for index, film in enumerate(films, start=1 + (page - 1) * 10):
+                    for index, film in enumerate(films, start=1 + (page - 1) * 1):
                         name = film.get('name', 'Название не указано')
                         shortDescription = film.get('shortDescription', 'Описание отсутствует')
                         year = film.get('year', 'Дата отсутствует')
-                        message = f"{index}. <b>{name}:</b>\n{shortDescription}\n<b>{year}</b>"
+                        poster_url = film.get('poster', {}).get('url')
+                        message = (f"{index}. <b>Название фильма:</b> <i>{name}</i>, <i>{year}</i>\n<b>Описание:</b> "
+                                   f"<b>{shortDescription}\n</b>")
                         messages.append(message)
 
-                    keyboard = [
-                        [
-                            types.InlineKeyboardButton(text="Далее", callback_data=f"next_page_{page + 1}")
-                        ]
-                    ]
-                    keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard)
+                        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                            [
+                                types.InlineKeyboardButton(text="Смотреть фильм",
+                                                           switch_inline_query_current_chat=f"{name}")
+                            ],
+                            [
+                                types.InlineKeyboardButton(text="◀️", callback_data="back"),
+                                types.InlineKeyboardButton(text='▶️', callback_data="next")
+                            ],
+                            [
+                                types.InlineKeyboardButton(text="Меню📖", callback_data="menu_clear")
+                            ]
+                        ])
 
-                    if messages:
-                        await callback.message.answer('\n\n'.join(messages), parse_mode='HTML', reply_markup=keyboard)
-                    else:
+                        try:
+                            if poster_url:
+                                await callback.message.answer_photo(photo=poster_url, caption='\n\n'.join(messages),
+                                                                    reply_markup=keyboard, parse_mode='HTML')
+                                break
+                        except Exception as photo_error:
+                            await callback.message.answer('\n\n'.join(messages), reply_markup=keyboard,
+                                                          parse_mode='HTML')
+
+
+                    if not messages:
                         await callback.message.answer("Фильмы не найдены.")
+                    elif not poster_url:
+                        await callback.message.answer('\n\n'.join(messages), reply_markup=keyboard, parse_mode='HTML')
                 else:
                     await callback.message.answer("Произошла ошибка при запросе к API.")
     except Exception as e:
-        print(callback.message.answer(f"Произошла ошибка: {str(e)}"))
+        await callback.message.answer(f"Произошла ошибка: {str(e)}")
 
+
+
+@commands_router.callback_query(F.data == "next")
+async def check(callback: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    current_page = data.get('page', 1)
+
+    new_page = current_page + 1
+
+    await state.update_data(page=new_page)
+
+    await compilation(callback, state)
+
+@commands_router.callback_query(F.data == "back")
+async def back(callback: CallbackQuery, state: FSMContext):
+
+    data = await state.get_data()
+    current_page = data.get('page', -1)
+
+    new_page = current_page - 1
+
+
+    await state.update_data(page=new_page)
+
+    await compilation(callback, state)
+
+@commands_router.callback_query(F.data == "menu_clear")
+async def clear(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    await menu(callback)
+
+
+@commands_router.callback_query(F.data == "random")
+async def random_film(callback: types.CallbackQuery):
+    url = "http://api.kinopoisk.dev/v1.4/movie/random"
+    headers = {
+        "X-API-Key": "VBZ63SW-PFHMYEM-M3384F6-X6BXVSY",
+        "accept": "application/json"
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=url, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    # Проверка наличия данных о фильме в ответе
+                    if 'docs' in data and data['docs']:
+                        film = data['docs'][0]
+                        await callback.message.delete()
+                        name = film.get('name', 'Название не указано')
+                        shortDescription = film.get('description', 'Описание отсутствует')
+                        year = film.get('year', 'Дата отсутствует')
+                        message = (f"<b>Название фильма:</b> <i>{name}</i>\n"
+                                   f"<b>Год:</b> <i>{year}</i>\n"
+                                   f"<b>Описание:</b> {shortDescription}")
+
+                        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                            [InlineKeyboardButton(text="Ещё фильм", callback_data="random")],
+                        ])
+
+                        await callback.message.answer(message, reply_markup=keyboard, parse_mode='HTML')
+                    else:
+                        # Если фильмы не найдены
+                        await callback.message.answer("Фильм не найден. Попробуйте ещё раз.")
+                else:
+                    # Если статус ответа не 200
+                    await callback.message.answer("Произошла ошибка при запросе к API. Попробуйте позже.")
+    except Exception as e:
+        # Обработка других исключений
+        await callback.message.answer(f"Произошла ошибка: {e}")

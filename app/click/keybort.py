@@ -12,8 +12,11 @@ button = [
         [
             InlineKeyboardButton(text="Видео Гайд🎥", callback_data="videogaid"),
             InlineKeyboardButton(text="Меню📖", callback_data="menu")
+        ],
+        [
+            InlineKeyboardButton(text="Подписка📜", callback_data="subscription")
         ]
-    ]
+]
 
 
 menu_button = [
@@ -25,11 +28,8 @@ menu_button = [
         InlineKeyboardButton(text="Фильмы🎞️", switch_inline_query_current_chat=""),
     ],
     [
-        InlineKeyboardButton(text="Подборка🛒", callback_data="Compilation")
-    ],
-    [
-        InlineKeyboardButton(text="Подписка📜", callback_data="subscription"),
-        InlineKeyboardButton(text="Промокоды🎁", callback_data="promo_codes")
+        InlineKeyboardButton(text="Подборка🛒", callback_data="Compilation"),
+        InlineKeyboardButton(text="Рандомный фильм", callback_data="random")
     ]
 ]
 
@@ -70,7 +70,7 @@ a_opportunities_button = [
 
 a_stat_button = [
     [
-        InlineKeyboardButton(text="Отоброжение пользователей🪬", callback_data="s_full_users")
+        InlineKeyboardButton(text="Отображение пользователей🪬", callback_data="s_full_users")
     ],
     [
         InlineKeyboardButton(text="Блокировка пользователя🗿", callback_data="s_block"),
