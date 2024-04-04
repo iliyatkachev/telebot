@@ -26,7 +26,7 @@ menu_button = [
     ],
     [
         InlineKeyboardButton(text="Подборка🛒", callback_data="Compilation"),
-        InlineKeyboardButton(text="Рандомный фильм", callback_data="random")
+        InlineKeyboardButton(text="Рандомный фильм🎲", callback_data="random")
     ]
 ]
 
