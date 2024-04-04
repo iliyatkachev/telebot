@@ -340,3 +340,4 @@ async def random_film(callback: types.CallbackQuery):
 
     except Exception as e:
         await callback.message.answer(f"Произошла ошибка: {str(e)}")
+#fish version random
