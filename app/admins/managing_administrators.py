@@ -1,17 +1,13 @@
 import sqlite3
-
 from aiogram import F, types, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, InlineKeyboardMarkup
-
 from app.SQL.sql import add_admin
-from app.admin.admin_menu import form_channel
 from app.click.keybort import admin_menu_button
 
-
-
 admin_router = Router()
+
 
 class Admin(StatesGroup):
     name_admin = State()

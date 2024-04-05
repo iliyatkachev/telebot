@@ -1,22 +1,17 @@
 import random
-from app.SQL.sql import bd, fetch_urls_and_ids, find_public_ids, fetch_admins_from_db
+from app.SQL.sql import bd, fetch_admins_from_db
 from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
-
-
-
 from app.admin.admin_menu import admin_start
 from app.click.keybort import button
 from app.comands.commands import menu
+
 
 name = None
 start_router = Router()
 
 
-
-#command start
 @start_router.message(Command("start"))
 async def protect(message: types.Message):
     await bd(message)
@@ -44,15 +39,11 @@ async def protect(message: types.Message):
         return await admin_start(message)
 
 
-
-
-
 @start_router.callback_query(F.data == "correct")
 async def start(callback: types.CallbackQuery):
     await callback.message.delete()
     reply_markup = InlineKeyboardMarkup(inline_keyboard=button)
     await callback.message.answer(text=f"Привет {callback.from_user.full_name}!", reply_markup=reply_markup)
-
 
 
 @start_router.callback_query(F.data == "f_menu")
@@ -75,6 +66,11 @@ async def hendel_help(message: types.Message):
         ]
     ]
     reply_markup = InlineKeyboardMarkup(inline_keyboard=button)
-    await message.answer(text="Если у вас возникли проблемы, обратитесь в службу поддержки...", reply_markup=reply_markup)
+    await message.answer(text="Если у вас возникли проблемы, обратитесь в службу поддержки...",
+                         reply_markup=reply_markup)
 
 
+@start_router.callback_query(F.data == 'back_button')
+async def back_button(callback: types.CallbackQuery):
+    await callback.answer('Вы перешли во вкладку меню')
+    await callback.message.delete()

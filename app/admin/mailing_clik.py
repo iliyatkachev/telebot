@@ -5,11 +5,13 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message, InlineKeyboardButton
 from aiogram.types import InlineKeyboardMarkup
 from app.click.keybort import a_mailing_button
-from app.SQL.sql import ferch_all_users
+from app.SQL.sql import fetch_all_users
 
 form_router = Router()
 mailing_router = Router()
 command = Command
+
+
 @mailing_router.callback_query(F.data == "mailing")
 async def mailing(callback: types.CallbackQuery):
     await callback.answer('Вы перешли во вкладкку рассылка')
@@ -35,6 +37,7 @@ async def form_com(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await callback.message.answer(text="Добавте фото!")
 
+
 @form_router.message(Form.photo)
 async def photo_com(message: Message, state: FSMContext):
     media_file_id = message.photo[-1].file_id
@@ -42,11 +45,13 @@ async def photo_com(message: Message, state: FSMContext):
     await state.set_state(Form.caption)
     await message.answer(text="Хорошо!\nТеперь напиши ваш текст:")
 
+
 @form_router.message(Form.caption)
 async def text_com(message: Message, state: FSMContext):
     await state.update_data(caption=message.text)
     await state.set_state(Form.text_clik)
     await message.answer(text="Отлично!\nТеперь добавте название кнопки:")
+
 
 @form_router.message(Form.text_clik)
 async def name_com(message: Message, state: FSMContext):
@@ -54,11 +59,13 @@ async def name_com(message: Message, state: FSMContext):
     await state.set_state(Form.url_clik)
     await message.answer(text="Идем дальше!\nТеперь нужно добавить url.")
 
+
 @form_router.message(Form.url_clik)
 async def url_com(message: Message, state: FSMContext):
     await state.update_data(url_clik=message.text)
     await state.set_state(Form.full_post)
     await message.answer(text=f"Готово\nТеперь введите ОК для продолжения.")
+
 
 @form_router.message(Form.full_post)
 async def full_com(message: Message, state: FSMContext):
@@ -98,6 +105,7 @@ async def full_com(message: Message, state: FSMContext):
         await message.answer(text="Как поступим?", reply_markup=done_b)
         await state.set_state(Form.full_post)
 
+
 @form_router.callback_query(F.data == "add_post_button")
 async def full_com(callback: types.CallbackQuery, state: FSMContext):
     if F.data == "add_post_button":
@@ -121,13 +129,12 @@ async def full_com(callback: types.CallbackQuery, state: FSMContext):
         }
         await state.update_data(full_post=post_data)
 
-        user_ids = ferch_all_users()
+        user_ids = fetch_all_users()
         for user_id in user_ids:
             try:
                 await callback.bot.send_photo(chat_id=user_id, photo=photo, caption=caption, reply_markup=reply)
             except Exception as e:
                 print(f"Не удалось отправить сообщение пользователю {user_id}: {e}")
-
 
 
 @form_router.callback_query(F.data == "delete_post_button")

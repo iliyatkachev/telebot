@@ -6,11 +6,9 @@ from aiogram import Dispatcher, types, Router
 dp = Dispatcher()
 name = None
 sql_router = Router()
-#
 
 
-#SELECT LIST
-def ferch_all_users():
+def fetch_all_users():
     connect = sqlite3.connect('users_bd.db')
     cursor = connect.cursor()
     cursor.execute("SELECT user_id FROM login_id")
@@ -19,7 +17,7 @@ def ferch_all_users():
     connect.close()
     return [user[0] for user in all_users]
 
-#DATA REG USERS
+
 def fetch_user_date(user_id):
     connect = sqlite3.connect('users_bd.db')
     cursor = connect.cursor()
@@ -32,7 +30,7 @@ def fetch_user_date(user_id):
     else:
         return None
 
-#NAME
+
 def fetch_user_name(user_id):
     connect = sqlite3.connect('users_bd.db')
     cursor = connect.cursor()
@@ -46,24 +44,21 @@ def fetch_user_name(user_id):
         return None
 
 
-
-#ADD SQL BD
 async def bd(message: types.Message):
-    all_users = ferch_all_users()
+    all_users = fetch_all_users()
     user_id = message.from_user.id
 
     if user_id not in all_users:
         connect = sqlite3.connect('users_bd.db')
         cursor = connect.cursor()
         users_id = message.from_user.id
-        cursor.execute("INSERT INTO login_id (user_id, date, name) VALUES (?, ?, ?)", (users_id, datetime.datetime.now(), message.from_user.full_name),)
+        cursor.execute("INSERT INTO login_id (user_id, date, name) VALUES (?, ?, ?)",
+                       (users_id, datetime.datetime.now(), message.from_user.full_name),)
         connect.commit()
         cursor.close()
         connect.close()
     else:
         pass
-
-
 
 
 async def add_channel(name: str, url: str, id_channel: str):
@@ -113,8 +108,6 @@ def fetch_urls_and_ids():
     return urls
 
 
-
-
 def find_public_ids():
     connect = sqlite3.connect('users_bd.db')
     cursor = connect.cursor()
@@ -130,7 +123,6 @@ def find_public_ids():
     return ids
 
 
-
 async def add_admin(name, id_admin):
     connect = sqlite3.connect('users_bd.db')
     cursor = connect.cursor()
@@ -144,11 +136,11 @@ async def add_admin(name, id_admin):
 
 
 async def fetch_admins_from_db():
-    connect = sqlite3.connect('users_bd.db')  # Путь к вашей базе данных
+    connect = sqlite3.connect('users_bd.db')
     cursor = connect.cursor()
-    # Запрос на выборку всех user_id администраторов из таблицы
+
     cursor.execute("SELECT id_admin FROM admin")
-    admins = cursor.fetchall()  # Получаем список кортежей с одним элементом
+    admins = cursor.fetchall()
 
     cursor.close()
     connect.close()

@@ -2,33 +2,33 @@ from aiogram.types import InlineKeyboardButton
 from aiogram import types
 
 
-
-
 button = [
         [
-            InlineKeyboardButton(text="Возможности✨", callback_data="opportunities"),
-            InlineKeyboardButton(text="Служба Поддержки🥸", url="https://t.me/Iltk01")
+            InlineKeyboardButton(text="Фильмы📖", callback_data="menu")
         ],
         [
-            InlineKeyboardButton(text="Видео Гайд🎥", callback_data="videogaid"),
-            InlineKeyboardButton(text="Меню📖", callback_data="menu")
-        ],
-        [
-            InlineKeyboardButton(text="Подписка📜", callback_data="subscription")
+            InlineKeyboardButton(text="Служба Поддержки🥸", url="https://t.me/Iltk01"),
+            InlineKeyboardButton(text="Видео Гайд🎥", callback_data="videogaid")
         ]
 ]
 
+back_button = [
+    [
+        InlineKeyboardButton(text='Вернуться назад', callback_data='back_back')
+    ]
+]
 
 menu_button = [
 
     [
-        InlineKeyboardButton(text="Фильмы🎞️", switch_inline_query_current_chat=""),
+        InlineKeyboardButton(text="Поиск фильмов🎞️", switch_inline_query_current_chat=""),
     ],
     [
         InlineKeyboardButton(text="Подборка🛒", callback_data="Compilation"),
         InlineKeyboardButton(text="Рандомный фильм🎲", callback_data="random")
     ]
 ]
+
 
 films_button = [
     [
@@ -51,6 +51,7 @@ admin_button = [
     ]
 ]
 
+
 a_opportunities_button = [
     [
         InlineKeyboardButton(text="Список админов", callback_data="list_admin"),
@@ -64,6 +65,7 @@ a_opportunities_button = [
         InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="back_a_m")
     ]
 ]
+
 
 a_stat_button = [
     [
@@ -85,12 +87,14 @@ back_button = [
     ]
 ]
 
+
 a_mailing_button = [
     [
         InlineKeyboardButton(text="Добавить✔️", callback_data="a_m_add"),
         InlineKeyboardButton(text="Вернуться в меню🔙", callback_data="back_a_m")
     ]
 ]
+
 
 a_channels_button = [
     [
@@ -102,11 +106,13 @@ a_channels_button = [
     ]
 ]
 
+
 admin_menu_button = [
     [
         InlineKeyboardButton(text='Вернуться в админ меню🔙', callback_data="back_a_m")
     ]
 ]
+
 
 again = [
     [
@@ -114,3 +120,4 @@ again = [
         types.InlineKeyboardButton(text='👈 В меню', callback_data='back_user_now')
     ]
 ]
+
