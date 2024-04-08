@@ -36,7 +36,7 @@ async def inline_films(inline_query: types.InlineQuery):
                 poster_url = film.get('poster', '').replace('\\/', '/')
                 quality = film.get('quality', '')
                 iframe_url = film.get('iframe_url', '').replace('\\/', '/')
-                my_site_url = f"https://kinodomvideo.ru/video.php?video_token={iframe_url}"
+                my_site_url = f"{iframe_url}"
                 unique_id = str(uuid4())
 
                 keyboard_buttons = [
@@ -77,16 +77,21 @@ async def inline_films(inline_query: types.InlineQuery):
                     id=unique_id,
                     title="Результаты не обнаружены 🫣",
                     input_message_content=types.InputTextMessageContent(message_text=
-                            f'<b>Вы попали в главное меню!</b>\nДля того, чтобы вам было проще понять бот,'
-                            f'вот пример как им пользоваться\n<b>Правильно:</b>\n✅ бесстыжие\n✅ Довод'
-                            f'\n✅ Обитель зла\n✅ ЗВЕРОПОЛИС'
-                            f'\n\n<b>Неправильно:</b>\n'
-                            f'❌ бесстыжие 3 сезон\n❌ kp571335\n❌ https://www.kinopoisk.ru\n'
-                            f'❌ https://www.kinopoisk.ru/series\n\n'
-                            f'<i>Для точного поиска отправь боту точное название фильма</i>',),
-                            description="Нажми на меня, чтобы узнать почему",
-                            reply_markup=ag_but
-                            ))
+                                                                        f'<b>Вы попали в главное меню!</b>\n'
+                                                                        f'Для того, чтобы вам было проще понять бот,'
+                                                                        f'вот пример как им пользоваться\n'
+                                                                        f'<b>Правильно:</b>\n✅ бесстыжие\n✅ Довод'
+                                                                        f'\n✅ Обитель зла\n✅ ЗВЕРОПОЛИС'
+                                                                        f'\n\n<b>Неправильно:</b>\n'
+                                                                        f'❌ бесстыжие 3 сезон\n'
+                                                                        f'❌ kp571335\n❌ https://www.kinopoisk.ru\n'
+                                                                        f'❌ https://www.kinopoisk.ru/series\n\n'
+                                                                        f'<i>Для точного поиска '
+                                                                        f'отправь боту точное название фильма</i>',),
+
+                    description="Нажми на меня, чтобы узнать почему",
+                    reply_markup=ag_but
+                    ))
 
             await inline_query.answer(results, cache_time=1, is_personal=True)
 

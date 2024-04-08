@@ -7,7 +7,6 @@ from app.admin.admin_menu import admin_start
 from app.click.keybort import button
 from app.comands.commands import menu
 
-
 name = None
 start_router = Router()
 
@@ -70,7 +69,20 @@ async def hendel_help(message: types.Message):
                          reply_markup=reply_markup)
 
 
-@start_router.callback_query(F.data == 'back_button')
-async def back_button(callback: types.CallbackQuery):
-    await callback.answer('Вы перешли во вкладку меню')
+@start_router.callback_query(F.data == 'back_back_back')
+async def back_button_menu(callback: types.CallbackQuery):
+    button_n = [
+        [
+            InlineKeyboardButton(text="Фильмы📖", callback_data="menu")
+        ],
+        [
+            InlineKeyboardButton(text="Служба Поддержки🥸", url="https://t.me/Iltk01"),
+            InlineKeyboardButton(text="Видео Гайд🎥", callback_data="videogaid")
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=button_n)
     await callback.message.delete()
+    await callback.message.answer('Вы перешли во вкладку меню', reply_markup=reply_markup)
+
+
+

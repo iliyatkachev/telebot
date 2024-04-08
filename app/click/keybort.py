@@ -12,9 +12,16 @@ button = [
         ]
 ]
 
-back_button = [
+videogaid = [
     [
-        InlineKeyboardButton(text='Вернуться назад', callback_data='back_back')
+        InlineKeyboardButton(text='Вернуться назад', callback_data='back_back_back')
+    ]
+]
+
+
+back_butt = [
+    [
+        InlineKeyboardButton(text='Вернуться назад', callback_data='back_back_back')
     ]
 ]
 
@@ -26,6 +33,9 @@ menu_button = [
     [
         InlineKeyboardButton(text="Подборка🛒", callback_data="Compilation"),
         InlineKeyboardButton(text="Рандомный фильм🎲", callback_data="random")
+    ],
+    [
+        InlineKeyboardButton(text='Вернуться назад', callback_data='back_back_back')
     ]
 ]
 

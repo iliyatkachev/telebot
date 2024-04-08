@@ -1,8 +1,9 @@
 from aiogram import F, types, Router
-from aiogram.types import InlineKeyboardMarkup
-from app.SQL.sql import fetch_user_date, fetch_all_users, find_public_ids
-from app.click.keybort import menu_button, back_button, admin_button
+from app.SQL.sql import fetch_all_users, find_public_ids
+from app.click.keybort import menu_button, admin_button
 from app.channel.channel_funk import channels_add
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 
 commands_router = Router()
 
@@ -53,11 +54,17 @@ async def s_full_users(callback: types.CallbackQuery):
 
 @commands_router.callback_query(F.data == "videogaid")
 async def videogaid(callback: types.CallbackQuery):
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=back_button)
+    back_button_non = [
+        [
+            InlineKeyboardButton(text='Вернуться назад', callback_data='back_back_back')
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=back_button_non)
     url = "https://drive.google.com/uc?export=download&id=1aw5xnktqOgGq6U7OF-R3ykJkYLc6tQT7"
     await callback.message.delete()
     await callback.message.answer_video(video=url, caption='Это видео поможет вам понять,'
                                                            'как работать с ботом', reply_markup=reply_markup)
+
 
 
 @commands_router.callback_query(F.data == "back_a_m")
